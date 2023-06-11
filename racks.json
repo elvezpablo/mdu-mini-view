@@ -1,0 +1,61 @@
+{
+  "NoDoor": false,
+  "DoorLeft": false,
+  "Immersion": false,
+  "Racks": [
+    {
+      "Number": 1,
+      "Shelves": 8,
+      "Positions": 2,
+      "StartIP": "172.20.170.62"
+    },
+    {
+      "Number": 2,
+      "Shelves": 8,
+      "Positions": 4,
+      "StartIP": "172.20.170.107"
+    },
+    {
+      "Number": 3,
+      "Shelves": 8,
+      "Positions": 4,
+      "StartIP": "172.20.170.152"
+    },
+    {
+      "Number": 4,
+      "Shelves": 8,
+      "Positions": 4,
+      "StartIP": "172.20.170.197"
+    },
+    {
+      "Number": 5,
+      "Shelves": 8,
+      "Positions": 4,
+      "StartIP": "172.20.170.242"
+    },
+    {
+      "Number": 6,
+      "Shelves": 8,
+      "Positions": 4,
+      "StartIP": "172.20.171.31"
+    },
+    {
+      "Number": 7,
+      "Shelves": 8,
+      "Positions": 4,
+      "StartIP": "172.20.171.76"
+    },
+    {
+      "Number": 8,
+      "Shelves": 8,
+      "Positions": 4,
+      "StartIP": "172.20.171.121"
+    },
+    {
+      "Number": 9,
+      "Shelves": 8,
+      "Positions": 2,
+      "StartIP": "172.20.171.121"
+    }
+  ]
+}
