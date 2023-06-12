@@ -25,7 +25,7 @@ export default function App() {
           backgroundColor: '#111',
         }}
       >
-        <div style={{ width: '440px' }}>
+        <div style={{ width: '80%' }}>
           <MDUMiniView2
             layout={layout}
             active={selected}

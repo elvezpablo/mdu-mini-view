@@ -22,7 +22,7 @@ const RacksContainer = styled.div`
   padding: 3px;
   border-radius: .125rem;
   display: flex;  
-  gap: 4px;
+  gap: 6px;
   width: 100%;
   &:focus {
     outline: 1px solid white;
@@ -49,6 +49,7 @@ const Miner = styled.div`
   background-color: #666;
   min-width: 5px;
   min-height: 5px;
+  aspect-ratio: 1.0;
 `;
 
 type Rack = {
@@ -90,7 +91,7 @@ export default function MDUMiniView2({
   onChange,
   active,
   multiSelect = false,
-  leftHanded = false
+  leftHanded = false,
 }: Props) {
   const rackContainerRef = React.useRef<HTMLDivElement>();
   const [selected, setSelected] = React.useState(new Set<number>());
@@ -100,111 +101,113 @@ export default function MDUMiniView2({
     cols: r.Positions,
     rows: r.Shelves,
   }));
-  const totalCols = racks.reduce((prev, cur) => (prev + cur.cols), 0)
+  const totalCols = racks.reduce((prev, cur) => prev + cur.cols, 0);
   return (
     <Container>
       {leftHanded && <Exit left={leftHanded} />}
-    <RacksContainer
-      tabIndex={1}
-      ref={rackContainerRef}
-      onKeyDown={(e) => {
-        if (e.key === 'ArrowLeft') {
-          setFocused(rackContainerRef.current.children, false);
-        }
-        if (e.key === 'ArrowRight') {
-          setFocused(rackContainerRef.current.children);
-        }
-
-        if (e.key === 'Enter') {
-          const idx = getFocusedIndex(rackContainerRef.current.children);
-          if (idx === -1) {
-            return;
+      <RacksContainer
+        tabIndex={1}
+        ref={rackContainerRef}
+        onKeyDown={(e) => {
+          if (e.key === 'ArrowLeft') {
+            setFocused(rackContainerRef.current.children, false);
           }
-          if(multiSelect) {
-            if (selected.has(idx)) {
-              selected.delete(idx);
+          if (e.key === 'ArrowRight') {
+            setFocused(rackContainerRef.current.children);
+          }
+
+          if (e.key === 'Enter') {
+            const idx = getFocusedIndex(rackContainerRef.current.children);
+            if (idx === -1) {
+              return;
+            }
+            if (multiSelect) {
+              if (selected.has(idx)) {
+                selected.delete(idx);
+              } else {
+                selected.add(idx);
+              }
             } else {
+              selected.clear();
               selected.add(idx);
             }
-          } else {
-            selected.clear();
-            selected.add(idx);
+
+            setSelected(new Set(selected));
+            onChange([...selected].sort());
           }
-          
-          setSelected(new Set(selected));
-          onChange([...selected].sort());
-        }
-        
-      }}
-      
-      onBlur={() => {
-        setHovered(undefined)
-      }}
-    >
-      {racks.map((r, i) => (
-        <RackContainer
-          tabIndex={1}
-          onMouseDown={(e) => {            
-            if(multiSelect && e.shiftKey) {
-              const focusedIndex = getFocusedIndex(rackContainerRef.current.children);
-              if (focusedIndex === -1) {
-                return;
-              }
-              const start = Math.min(focusedIndex, hovered);
-              const end = Math.max(focusedIndex, hovered);
-              const shouldAdd = !selected.has(hovered);
-              
-              Array.from(rackContainerRef.current.children).forEach((e, i) => {
-                if(i >= start && i <= end) {                  
-                  if(shouldAdd) {
-                    selected.add(i)
-                  } else {
-                    selected.delete(i);
-                  }
-                  if(e instanceof HTMLElement) {
-                    e.focus()
-                  }
+        }}
+        onBlur={() => {
+          setHovered(undefined);
+        }}
+      >
+        {racks.map((r, i) => (
+          <RackContainer
+            tabIndex={1}
+            onMouseDown={(e) => {
+              if (multiSelect && e.shiftKey) {
+                const focusedIndex = getFocusedIndex(
+                  rackContainerRef.current.children
+                );
+                if (focusedIndex === -1) {
+                  return;
                 }
-              })
-              setSelected(new Set(selected));
-              onChange([...selected].sort());
-            } else {
-              if(multiSelect) {
-                if (selected.has(i)) {
-                  selected.delete(i);
+                const start = Math.min(focusedIndex, hovered);
+                const end = Math.max(focusedIndex, hovered);
+                const shouldAdd = !selected.has(hovered);
+
+                Array.from(rackContainerRef.current.children).forEach(
+                  (e, i) => {
+                    if (i >= start && i <= end) {
+                      if (shouldAdd) {
+                        selected.add(i);
+                      } else {
+                        selected.delete(i);
+                      }
+                      if (e instanceof HTMLElement) {
+                        e.focus();
+                      }
+                    }
+                  }
+                );
+                setSelected(new Set(selected));
+                onChange([...selected].sort());
+              } else {
+                if (multiSelect) {
+                  if (selected.has(i)) {
+                    selected.delete(i);
+                  } else {
+                    selected.add(i);
+                  }
                 } else {
+                  selected.clear();
                   selected.add(i);
                 }
-              } else {
-                selected.clear();
-                selected.add(i);
+                setSelected(new Set(selected));
+                onChange([...selected].sort());
+                e.currentTarget.focus();
               }
-              setSelected(new Set(selected));
-              onChange([...selected].sort());
-              e.currentTarget.focus();
-            }            
-          }}
-          onMouseOver={() => {                         
-            setHovered(i)
-          }}
-          onMouseOut={() => {
-            setHovered(undefined)
-          }}
-          className="rack"
-          style={{
-            backgroundColor: selected.has(i) ? '#2F2' : '#222',
-            width: `${(r.cols / totalCols) * 100}%`,
-            gridTemplateColumns: `repeat(${r.cols}, 1fr)`,
-            gridTemplateRows: `repeat(${r.rows}, 1fr)`,
-          }}
-        >
-          {Array.from(Array(r.cols * r.rows)).map(() => (
-            <Miner />
-          ))}
-        </RackContainer>
-      ))}
-    </RacksContainer>
-    {!leftHanded && <Exit left={leftHanded} />}
+            }}
+            onMouseOver={() => {
+              setHovered(i);
+            }}
+            onMouseOut={() => {
+              setHovered(undefined);
+            }}
+            className="rack"
+            style={{
+              backgroundColor: selected.has(i) ? '#2F2' : '#222',
+              width: `${Math.floor((r.cols / totalCols) * 100)}%`,
+              gridTemplateColumns: `repeat(${r.cols}, 1fr)`,
+              gridTemplateRows: `repeat(${r.rows}, 1fr)`,
+            }}
+          >
+            {Array.from(Array(r.cols * r.rows)).map(() => (
+              <Miner />
+            ))}
+          </RackContainer>
+        ))}
+      </RacksContainer>
+      {!leftHanded && <Exit left={leftHanded} />}
     </Container>
   );
 }
